@@ -6,25 +6,12 @@
 \usepackage{mathtools}
 \usepackage{amsthm}
 \usepackage[many]{tcolorbox}
+\usepackage{listings}
 
-\newtheorem{theorem}{Satz}
 \newtheorem{lemma}{Lemma}
-\newtheorem*{corollary}{Folgerung}
 \newtheorem{definition}{Definition}
 \newtheorem*{definition*}{Def}
-\newtheorem*{remark}{Beberkung}
-\newtheorem*{example}{Beispiel}
-
-\tcolorboxenvironment{theorem}{
-	colback=blue!5!white,
-	boxrule=0pt,
-	boxsep=1pt,
-	left=2pt,right=2pt,top=2pt,bottom=2pt,
-	oversize=2pt,
-	sharp corners,
-	before skip=\topsep,
-	after skip=\topsep,
-}
+\newtheorem{algorithm}{Algorithm}
 
 \tcolorboxenvironment{lemma}{
 	colback=yellow!5!white,
@@ -60,11 +47,134 @@
 }
 \begin{document}
 	
-\title{Automated Deduction S2023}
+\title{Automated Deduction Compendium SS2023}
 \author{Ida Hönigmann}
 
 \maketitle
 
-\section{}
+\section{Introduction, SAT Solving}
+
+\subsubsection{Proposition, Formulas}
+\begin{definition*}[Proposition]
+	Proposition is a statement that can be either true or false.
+\end{definition*}
+
+\begin{definition*}[Propositional formula, Atom, Connective]
+	Atoms are boolean variables (e.g. p,q).
+	
+	\begin{enumerate}
+		\item Atoms are formulas.
+		\item $\top$, $\bot$ are formulas.
+		\item If $A$ is a formula, then $\lnot A$ is a formula.
+		\item If $A_1, ..., A_n$ are formulas, then $(A_1 \land ... \land A_n)$ and $(A_1 \lor ... \lor A_n)$ are formulas.
+		\item If $A$ and $B$ are formulas, then $A \rightarrow B$ and $A \leftrightarrow B$ are formulas.
+	\end{enumerate}
+
+	The symbols $\top, \bot, \land, \lor, \lnot, \rightarrow, \leftrightarrow$ are called logical connectives.
+\end{definition*}
+
+\subsubsection{Precedence}
+\begin{center}
+	\begin{tabular}{|c c c|}
+		\hline
+		Connective & Name & Precedence \\
+		\hline
+		$\top$            & verum       &   \\  
+		$\bot$            & falsum      &   \\
+		$\lnot$           & negation    & 5 \\  
+		$\land$           & conjunction & 4 \\
+		$\lor$            & disjunction & 3 \\  
+		$\rightarrow$     & implication & 2 \\
+		$\leftrightarrow$ & equivalence & 1 \\  
+		\hline
+	\end{tabular}
+\end{center}
+
+\subsubsection{Boolean Values, Interpretation}
+\begin{definition*}[Boolean values, Interpretation]
+	There are two boolean vales: true ($1$) and false ($0$).
+	
+	An interpretation for a set $P$ of boolean variables is a mapping $I : P \rightarrow \{0,1\}$.
+\end{definition*}
+
+\subsubsection{Interpreting formulas}
+\begin{enumerate}
+	\item $I(\top) = 1$ and $I(\bot) = 0$
+	\item $I(A_1 \land ... \land A_n) = 1$ iff $I(A_i) = 1$ for all $i$
+	\item $I(A_1 \lor ... \lor A_n) = 1$ iff $I(A_i) = 1$ for some $i$
+	\item $I(\lnot A) = 1$ iff $I(A) = 0$
+	\item $I(A_1 \rightarrow A_2) = 1$ iff $I(A_1) = 0$ or $I(A_2) = 1$
+	\item $I(A_1 \leftrightarrow A_2) = 1$ iff $I(A_1) = I(A_2)$
+\end{enumerate}
+
+\subsubsection{Safisfiable, Valid, Model}
+\begin{definition*}[Satisfiable, Model, Valid]
+	If $I(A) = 1$ then $I$ satisfies $A$ and $I$ is a model of $A$, denoted by $I \models A$.
+	
+	$A$ is satisfiable if some interpretation is a model of $A$.
+	
+	$A$ is valid if every interpretation is a model of $A$.
+	
+	$A$ and $B$ are equivalent, denoted by $A \equiv B$, if they have the same models.
+\end{definition*}
+
+\subsubsection{Connection valid, satisfiable}
+\begin{enumerate}
+	\item $A$ is valid iff $\lnot A$ is unsatisfiable.
+	\item $A$ is satisfiable iff $\lnot A$ is not valid.
+\end{enumerate}
+
+\subsubsection{Equivalent replacement}
+\begin{definition*}[Equivalent replacement]
+	$A[B]$ is a formula $A$ with a fixed occurrence of subformula $B$. $A[B']$ is the formula $A$ where every occurrence of $B$ is replaced by $B'$.
+\end{definition*}
+
+\begin{lemma}[Equivalent Replacement]
+	Let $I$ be an interpretation and $I \models A_1 \leftrightarrow A_2$. Then $I \models B[A_1] \leftrightarrow B[A_2]$.
+	
+	Let $A_1 \equiv A_2$. Then $B[A_1] \equiv B[A_2]$.
+\end{lemma}
+
+
+\subsubsection{Evaluating a formula}
+\begin{algorithm}
+\begin{lstlisting}
+procedure evaluate(G,I)
+input: formula G, interpretation I
+output: the boolean value I(G)
+begin
+  forall atoms p occurring in G
+    if I models p
+      then replace all occurrences of p in G by 1;
+      else replace all occurrences of p in G by 0;
+  rewrite G into a normal form using the rewrite rules
+  if G = 1 then return 1 else return 0
+end
+	\end{lstlisting}
+\end{algorithm}
+
+\section{Splitting, Polarities}
+
+\section{CNF, DPLL, MiniSat}
+
+\section{Random SAT, Horn clauses}
+
+\section{First-Order Logic, Theories}
+
+\section{SMT, Theory of Equality, DPLL(T)}
+
+\section{Theory of Arrays, Theory Combination, Nelson-Oppen, Z3}
+
+\section{First-Order Theorem Proving, TPTP, Inference Systems}
+
+\section{Selection functions, Saturation, Fairness and Redundancy}
+
+\section{Redundancy, First-Order Reasoning with Equality}
+
+\section{Ground Superposition, Term Orderings}
+
+\section{Unification and Lifting}
+
+\section{Non-Ground Superposition}
 
 \end{document}
