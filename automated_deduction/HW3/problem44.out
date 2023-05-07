@@ -1,0 +1,31 @@
+% Refutation found. Thanks to Tanya!
+% SZS status Theorem for problem4
+% SZS output start Proof for problem4
+1. ! [X0] : mult(e,X0) = X0 [input]
+3. ! [X0,X1,X2] : mult(mult(X0,X1),X2) = mult(X0,mult(X1,X2)) [input]
+4. (e = mult(X2,X0) & ! [X0,X1,X2] : e = mult(X1,X0)) => X1 = X2 [input]
+5. ~! [X2,X1,X0] : ((e = mult(X2,X0) & ! [X0,X1,X2] : e = mult(X1,X0)) => X1 = X2) [negated conjecture 4]
+6. ~! [X0,X1,X2] : ((e = mult(X0,X2) & ! [X3,X4] : e = mult(X4,X3)) => X0 = X1) [rectify 5]
+7. ? [X0,X1,X2] : (X0 != X1 & (e = mult(X0,X2) & ! [X3,X4] : e = mult(X4,X3))) [ennf transformation 6]
+8. ? [X0,X1,X2] : (X0 != X1 & e = mult(X0,X2) & ! [X3,X4] : e = mult(X4,X3)) [flattening 7]
+9. ? [X0,X1,X2] : (X0 != X1 & e = mult(X0,X2) & ! [X3,X4] : e = mult(X4,X3)) => (sK0 != sK1 & e = mult(sK0,sK2) & ! [X3,X4] : e = mult(X4,X3)) [choice axiom]
+10. sK0 != sK1 & e = mult(sK0,sK2) & ! [X3,X4] : e = mult(X4,X3) [skolemisation 8,9]
+11. mult(e,X0) = X0 [cnf transformation 1]
+13. mult(mult(X0,X1),X2) = mult(X0,mult(X1,X2)) [cnf transformation 3]
+14. e = mult(X4,X3) [cnf transformation 10]
+16. sK0 != sK1 [cnf transformation 10]
+17. mult(X0,mult(X1,X2)) = mult(e,X2) [backward demodulation 13,14]
+18. mult(X0,mult(X1,X2)) = X2 [forward demodulation 17,11]
+19. mult(X0,e) = X2 [forward demodulation 18,14]
+21. X1 = X2 [superposition 19,19]
+31. sK0 != X0 [superposition 16,21]
+40. $false [subsumption resolution 31,21]
+% SZS output end Proof for problem4
+% ------------------------------
+% Version: Vampire 4.5.1 (commit 57a6f78c on 2020-07-15 11:59:04 +0200)
+% Termination reason: Refutation
+
+% Memory used [KB]: 383
+% Time elapsed: 0.0000 s
+% ------------------------------
+% ------------------------------

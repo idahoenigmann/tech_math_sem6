@@ -1,0 +1,23 @@
+% SZS status CounterSatisfiable for problem42_2
+% # SZS output start Saturation.
+tff(u30,negated_conjecture,
+    (g(a) != f(sK1,sK0))).
+
+tff(u29,negated_conjecture,
+    (f(a,b) = g(sK2))).
+
+tff(u28,hypothesis,
+    (f(a,a) = g(a))).
+
+tff(u27,axiom,
+    ((~(![X0] : ((g(X0) = f(X0,a))))) | (![X0] : ((g(X0) = f(X0,a)))))).
+
+% # SZS output end Saturation.
+% ------------------------------
+% Version: Vampire 4.5.1 (commit 57a6f78c on 2020-07-15 11:59:04 +0200)
+% Termination reason: Satisfiable
+
+% Memory used [KB]: 4861
+% Time elapsed: 0.0000 s
+% ------------------------------
+% ------------------------------
