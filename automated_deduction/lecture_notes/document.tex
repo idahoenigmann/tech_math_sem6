@@ -50,13 +50,13 @@
 \begin{definition*}[Propositional formula, Atom, Connective]
 	Atoms are boolean variables (e.g. p,q).
 	
-	\begin{enumerate}
+	\begin{itemize}
 		\item Atoms are formulas.
 		\item $\top$, $\bot$ are formulas.
 		\item If $A$ is a formula, then $\lnot A$ is a formula.
 		\item If $A_1, ..., A_n$ are formulas, then $(A_1 \land ... \land A_n)$ and $(A_1 \lor ... \lor A_n)$ are formulas.
 		\item If $A$ and $B$ are formulas, then $A \rightarrow B$ and $A \leftrightarrow B$ are formulas.
-	\end{enumerate}
+	\end{itemize}
 
 	The symbols $\top, \bot, \land, \lor, \lnot, \rightarrow, \leftrightarrow$ are called logical connectives.
 \end{definition*}
@@ -86,14 +86,14 @@
 \end{definition*}
 
 \subsubsection{Interpreting formulas}
-\begin{enumerate}
+\begin{itemize}
 	\item $I(\top) = 1$ and $I(\bot) = 0$
 	\item $I(A_1 \land ... \land A_n) = 1$ iff $I(A_i) = 1$ for all $i$
 	\item $I(A_1 \lor ... \lor A_n) = 1$ iff $I(A_i) = 1$ for some $i$
 	\item $I(\lnot A) = 1$ iff $I(A) = 0$
 	\item $I(A_1 \rightarrow A_2) = 1$ iff $I(A_1) = 0$ or $I(A_2) = 1$
 	\item $I(A_1 \leftrightarrow A_2) = 1$ iff $I(A_1) = I(A_2)$
-\end{enumerate}
+\end{itemize}
 
 \subsubsection{Safisfiable, Valid, Model}
 \begin{definition*}[Satisfiable, Model, Valid]
@@ -107,10 +107,10 @@
 \end{definition*}
 
 \subsubsection{Connection valid, satisfiable}
-\begin{enumerate}
+\begin{itemize}
 	\item $A$ is valid iff $\lnot A$ is unsatisfiable.
 	\item $A$ is satisfiable iff $\lnot A$ is not valid.
-\end{enumerate}
+\end{itemize}
 
 \subsubsection{Equivalent replacement}
 \begin{definition*}[Equivalent replacement]
@@ -150,10 +150,10 @@ $A_p^\bot$ and $A_p^\top$ are obtained by replacing in $A$ all occurrences of $p
 \begin{lemma}
 	Let $p$ be an atom, $A$ be a formula, and $I$ be an interpretation.
 	
-	\begin{enumerate}
+	\begin{itemize}
 		\item If $I \not\models p$, then $A$ is equivalent to $A_p^\bot$ in $I$.
 		\item If $I \models p$, then $A$ is equivalent to $A_p^\top$ in $I$.
-	\end{enumerate}
+	\end{itemize}
 \end{lemma}
 
 \begin{lemma}
@@ -189,13 +189,13 @@ $A_p^\bot$ and $A_p^\top$ are obtained by replacing in $A$ all occurrences of $p
 \end{algorithm}
 
 \subsubsection{Polarities}
-\begin{enumerate}
+\begin{itemize}
 	\item $A|_\epsilon = A$ and $pol(A,\epsilon) = 1$
 	\item If $A|\pi = B_1 \land ... \land B_n$ or $A|\pi = B_1 \lor ... \lor B_n$ then $A|_{\pi.i} = B_i$ and $pol(A,\pi.i) = pol(A,\pi)$.
 	\item If $A|_pi = \lnot B$ then $A|_{\pi.1} = B$ and $pol(A,\pi.1) = -pol(A,\pi)$.
 	\item If $A|_\pi = B_1 \rightarrow B_2$ then $A|_{\pi.1} = B_1$, $A|_{\pi.2} = B_2$ and $pol(A,\pi.1) = -pol(A,\pi)$, $pol(A,\pi.2) = pol(A,\pi)$.
 	\item If $A|_\pi = B_1 \leftrightarrow B_2$ then $A|_{\pi.1} = B_1$, $A|_{\pi.2} = B_2$ and $pol(A,\pi.1) = 0 = pol(A,\pi.2)$.
-\end{enumerate}
+\end{itemize}
 
 \subsubsection{Monotonic replacement}
 
@@ -321,7 +321,148 @@ If $L$ is a pure literal in $S$ then all clauses containing this literal can be 
 
 \section{Random SAT, Horn clauses}
 
+\subsubsection{Random Clause Generation}
+
+Fix a number $n$ of boolean variables. Fix the length $k$ of the clause. Choose $k$ times a random literal $p_1, .., p_n, \lnot p_1, ..., \lnot p_n$ with equal probability.
+
+\subsubsection{k-SAT}
+
+We can reduce SAT to 3-SAT by naming: Let $L_1 \lor L_2 \lor L_3 \lor L4 \lor ...$ be a clause with more then 3 literals. Then we can replace it with $L_1 \lor L_2 \lor n$ and $\lnot n \lor L_3 \lor L4 \lor ...$ where $n$ is a new variable.
+
+SAT is NP-complete. 2-SAT is decidable in linear time. 3-SAT is NP-complete.
+
+\subsubsection{Chaos Algorithm, GSAT, WSAT}
+
+\begin{algorithm}
+	\begin{verbatim}
+		procedure chaos(S)
+		input: set of clauses S
+		output: interpretation I such that I models S or don't know
+		parameters: positive interger max_tries
+		begin
+		  repeat max_tries times
+		    I := random interpretation
+		    if I models S then return I
+		  return don't know
+		end
+	\end{verbatim}
+\end{algorithm}
+
+\begin{algorithm}
+	\begin{verbatim}
+		procedure GSAT(S)
+		input: set of clauses S
+		output: interpretation I such that I models S or don't know
+		parameters: positive intergers max_tries, max_flips
+		begin
+		  repeat max_tries times
+		    I := random interpretation
+		    if I models S then return I
+		    repeat max_flips times
+		      p := a variable such that flip(I, p) satisfies the maximal number of clauses in S
+		      I = flip(I,p)
+		      if I models S then return I
+		  return don't know
+		end
+	\end{verbatim}
+\end{algorithm}
+
+\begin{algorithm}
+	\begin{verbatim}
+		procedure WSAT(S)
+		input: set of clauses S
+		output: interpretation I such that I models S or don't know
+		parameters: positive intergers max_tries, max_flips
+		begin
+		  repeat max_tries times
+		    I := random interpretation
+		    if I models S then return I
+		    repeat max_flips times
+		      randomly select a clause C in S such that I does not model C
+		      randomly select a variable p in C
+		      I = flip(I,p)
+		      if I models S then return I
+		  return don't know
+		end
+	\end{verbatim}
+\end{algorithm}
+
+\subsubsection{SAT of Horn clauses}
+
+Satisfiability of horn clauses can be decided using unit propagation.
+
 \section{First-Order Logic, Theories}
+
+\subsubsection{Syntax}
+
+\begin{definition*}[Signature]
+	A signature consists of
+	\begin{itemize}
+		\item a set of sorts (e.g. integers, arrays of rationals) denoted by $\alpha, \beta$.
+		\item constants, denoted by $a,b,c$. Each constant $c$ has a sort $\alpha$, written $c: \alpha$.
+		\item function symbols, denoted by $f,g$. Each function symbol $f$ has a type $\alpha_1 \times ... \times \alpha_n \rightarrow \alpha$.
+		\item Predicate symbols, denoted by $p,q$. Each predicate symbol $p$ has a type $\alpha_1 \times ... \times \alpha_n$.
+	\end{itemize}
+\end{definition*}
+
+Variables are not part of the signature, but do have sorts.
+
+\begin{definition*}[Interpretation]
+	An interpretation $I$ maps
+	\begin{itemize}
+		\item each sort to a non-empty set, called the domain of this sort.
+		\item each constant $c:\alpha$ to an element $c' \in I(\alpha)$.
+		\item each variable $x: \alpha$ to an element $x' \in I(\alpha)$.
+		\item each function symbol $f: \alpha_1 \times ... \times \alpha_n \rightarrow \alpha$ to a function $f':I(\alpha_1) \times ... \times I(\alpha_n) \rightarrow I(\alpha)$.
+		\item each predicate symbol $p: \alpha_1 \times ... \times \alpha_n$ to a relation $p'$ on $I(\alpha_1) \times ... \times I(\alpha_n)$.
+	\end{itemize}
+\end{definition*}
+
+\begin{definition*}[Term, Atomic Formula]
+	Terms of the sort $\alpha$ are constants $c: \alpha$ or variables $x: \alpha$. If $t_1, ..., t_n$ are terms of the sorts $\alpha_1, ..., \alpha_n$ and $f: \alpha_1 \times ... \times \alpha_n \rightarrow \alpha$, then $f(t_1, ..., t_n)$ is a term of the sort $\alpha$.
+	
+	An atomic formula is an expression $p(t_1, ..., t_n)$ where $p: \alpha_1 \times ... \times \alpha_n$ and $t_1, ..., t_n$ are terms of sorts $\alpha_1, ..., \alpha_n$.
+\end{definition*}
+
+Note that $=$ and $>$ are interpreted, but other symbols are uninterpreted.
+
+\begin{definition*}[Formula, Quantifier, Bound, Free, Ground]
+	Let $A$ be a formula and $x$ a variable, then $\forall x A$ and $\exists x A$ are formulas.
+	
+	The symbols $\forall, \exists$ are called quantifiers.
+	
+	A variable occurring in a formula $A$ is called bound, if it is in the scope of a quantifier, otherwise it is called free.
+	
+	A formula is called ground or quantifier-free if it contains no occurrences of quantifiers.
+\end{definition*}
+
+\begin{definition*}[x-variants]
+	Let $\bar{x}$ be a sequence of variables. We say that two interpretations of the same signature $\Sigma$ are $\bar{x}$-variants if they coincide on all symbols and all variables not occurring in $\bar{x}$.
+\end{definition*}
+
+\begin{definition*}[Extension of interpretation]
+	Let $I$ be an interpretation and $t$ a term of sort $\alpha$. Define an element $t^I \in I(\alpha)$ as follows.
+	\begin{itemize}
+		\item for constants $c: \alpha$ and variables $x: \alpha$ we have $c^I \iff I(c)$ and $x^I \iff I(x)$.
+		\item $f(t_1,...,t_n)^I \iff f'(t_1^I,...,t_n^I)$.
+		\item $p(t_1,...,t_n)^I = 1 \iff (t_1^I,...,t_n^I) \in p^I$.
+		\item for connectives as before, e.g. $(A\rightarrow B)^I \iff (A^I = 0 \lor B^I = 1)$
+		\item $(\forall x A)^I = 1$ iff for all $\bar{x}$-variants $I'$ of $I$ we have $(A)^{I'} = 1$.
+		\item $(\exists x A)^I = 1$ iff for some $\bar{x}$-variants $I'$ of $I$ we have $(A)^{I'} = 1$.
+	\end{itemize}
+\end{definition*}
+
+\begin{definition*}[Satisfiable, Valid]
+	A formula $A$ with free variables $\bar{x}$ is said to be satisfiable in an interpretation $I$ if for some $\bar{x}$-variant $I'$ of $A$ we have $I' \models A$.
+	
+	$A$ is satisfiable iff it is satisfiable in some interpretation.
+	
+	A formula $A$ with free variables $\bar{x}$ is said to be valid in an interpretation $I$ if for every $\bar{x}$-variant $I'$ of $A$ we have $I' \models A$.
+	
+	$A$ is valid iff it is valid in every interpretation.
+\end{definition*}
+
+$A$ is valid iff $\lnot A$ is unsatisfiable.
 
 \section{SMT, Theory of Equality, DPLL(T)}
 
