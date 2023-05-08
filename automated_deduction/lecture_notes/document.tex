@@ -247,9 +247,77 @@ Denote with $A[B]_\pi$ formula $A$ with the subformula at the position $\pi$ rep
 
 \section{CNF, DPLL, MiniSat}
 
-\begin{definition*}[Literal]
+\subsubsection{Clause}
+
+\begin{definition*}[Literal, Clause, Empty clause, Unit clause, Horn clause]
 	A literal is either an atom $p$ or its negation $\lnot p$.
+	
+	A clause is a disjunction of literals $L_1 \lor ... \lor L_n$.
+	
+	The empty clause $\square$ is false in every interpretation.
+	
+	If $n=1$ then the clause is called unit clause.
+	
+	A horn clause is a clause with at most one positive literal.
 \end{definition*}
+
+\subsubsection{CNF}
+
+\begin{definition*}[CNF]
+	A formula $A$ is in conjenctive normal form if it is $\top$, $\bot$ or a conjunction of disjunctions of literals $\bigwedge_i \bigvee_j L_{i,j}$.
+\end{definition*}
+
+\subsubsection{Naming}
+
+If A is a non-trivial subformula $A$. Introduce a new name $n$ for it. Add formula $n \leftrightarrow A$ and replace subformula by its name in the original formula.
+
+\begin{lemma}[Naming]
+	Let $S$ be a set of formulas and $A$ a formula. Let $n$ be a boolean variable not occurring in $S$, nor in $A$.
+	
+	Then $S$ is satisfiable iff the set of formulas $S \cup \{n \leftrightarrow A\}$ is satisfiable.
+\end{lemma}
+
+\subsubsection{Optimized CNF Transformation}
+
+Introduce a new name $n$ every subformula $B$ and replace it with the name. If the subformula occurs only positively then add $n \rightarrow B$. If it occurs only negatively then add $B \rightarrow n$ and if it does not occur only positively or negatively than add $n \leftrightarrow B$.
+
+\begin{lemma}
+	A set of formulas is satisfiable iff the optimized CNF transformation of these formulas is satisfiable.
+\end{lemma}
+
+\subsubsection{Unit propagation}
+
+Let $S$ be a set of clauses. If $S$ contains a unit clause $L$ then remove from $S$ every clause of the form $L \lor C$ and replace in $S$ every clause of the form $\bar{L} \lor C$ by the clause $C$.
+
+\subsubsection{DPLL = splitting + unit propagation}
+
+\begin{algorithm}
+	\begin{verbatim}
+		procedure DPLL(S)
+		input: set of clauses S
+		output: satisfiable or unsatisfiable
+		parameters: function select_literal
+		begin
+		  S := propagate(S) # unit propagation
+		  if S is empty then return satisfiable
+		  if S contains 0 then return unsatisfiable
+		  L := select_literals(S) # splitting
+		  if DPLL(S union {L}) = satisfiable
+		    then return satisfiable
+		    else return DPLL(S union {not L})
+		end
+	\end{verbatim}
+\end{algorithm}
+
+Tautologies (e.g. $p \lor \lnot p \lor C$) can be removed.
+
+\subsubsection{Pure literals}
+
+\begin{definition*}[Pure literal]
+	A literal $L$ in $S$ is called pure if $S$ contains no clauses of the form $\bar{L} \lor C$.
+\end{definition*}
+
+If $L$ is a pure literal in $S$ then all clauses containing this literal can be removed.
 
 \section{Random SAT, Horn clauses}
 
