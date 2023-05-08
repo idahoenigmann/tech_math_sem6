@@ -9,23 +9,11 @@
 \usepackage{listings}
 
 \newtheorem{lemma}{Lemma}
-\newtheorem{definition}{Definition}
 \newtheorem*{definition*}{Def}
 \newtheorem{algorithm}{Algorithm}
 
 \tcolorboxenvironment{lemma}{
 	colback=yellow!5!white,
-	boxrule=0pt,
-	boxsep=1pt,
-	left=2pt,right=2pt,top=2pt,bottom=2pt,
-	oversize=2pt,
-	sharp corners,
-	before skip=\topsep,
-	after skip=\topsep,
-}
-
-\tcolorboxenvironment{definition}{
-	colback=green!5!white,
 	boxrule=0pt,
 	boxsep=1pt,
 	left=2pt,right=2pt,top=2pt,bottom=2pt,
@@ -138,7 +126,7 @@
 
 \subsubsection{Evaluating a formula}
 \begin{algorithm}
-\begin{lstlisting}
+\begin{verbatim}
 procedure evaluate(G,I)
 input: formula G, interpretation I
 output: the boolean value I(G)
@@ -150,12 +138,118 @@ begin
   rewrite G into a normal form using the rewrite rules
   if G = 1 then return 1 else return 0
 end
-	\end{lstlisting}
+\end{verbatim}
 \end{algorithm}
 
 \section{Splitting, Polarities}
 
+\subsubsection{Soundness of Splitting}
+
+$A_p^\bot$ and $A_p^\top$ are obtained by replacing in $A$ all occurrences of $p$ by $\bot$ and $\top$ respectively.
+
+\begin{lemma}
+	Let $p$ be an atom, $A$ be a formula, and $I$ be an interpretation.
+	
+	\begin{enumerate}
+		\item If $I \not\models p$, then $A$ is equivalent to $A_p^\bot$ in $I$.
+		\item If $I \models p$, then $A$ is equivalent to $A_p^\top$ in $I$.
+	\end{enumerate}
+\end{lemma}
+
+\begin{lemma}
+	Let $A$ be a formula and $p$ an atom.
+	
+	Then $A$ is satisfiable iff at least one of the formulas $A_p^\top$ and $A_p^\bot$ is satisfiable.
+\end{lemma}
+
+\subsubsection{Splitting}
+
+\begin{algorithm}
+	\begin{verbatim}
+		procedure split(G)
+		parameters: function select
+		input: formula G
+		output: ''satisfiable'' or ''unsatisfiable''
+		begin
+		  G := simplify(G)		# rewrite rules
+		  if G = 1 then return ''satisfiable''
+		  if G = 0 then return ''unsatisfiable''
+		  (p,b) := select(G)
+		  case b of
+		  1 =>
+		    if split(replace(G,p,1)) = ''satisfiable''
+		      then return ''satisfiable''
+		      else return split(replace(G,p,0))
+		  0 =>
+		    if split(replace(G,p,0)) = ''satisfiable''
+		      then return ''satisfiable''
+		      else return split(replace(G,p,1))
+		end
+	\end{verbatim}
+\end{algorithm}
+
+\subsubsection{Polarities}
+\begin{enumerate}
+	\item $A|_\epsilon = A$ and $pol(A,\epsilon) = 1$
+	\item If $A|\pi = B_1 \land ... \land B_n$ or $A|\pi = B_1 \lor ... \lor B_n$ then $A|_{\pi.i} = B_i$ and $pol(A,\pi.i) = pol(A,\pi)$.
+	\item If $A|_pi = \lnot B$ then $A|_{\pi.1} = B$ and $pol(A,\pi.1) = -pol(A,\pi)$.
+	\item If $A|_\pi = B_1 \rightarrow B_2$ then $A|_{\pi.1} = B_1$, $A|_{\pi.2} = B_2$ and $pol(A,\pi.1) = -pol(A,\pi)$, $pol(A,\pi.2) = pol(A,\pi)$.
+	\item If $A|_\pi = B_1 \leftrightarrow B_2$ then $A|_{\pi.1} = B_1$, $A|_{\pi.2} = B_2$ and $pol(A,\pi.1) = 0 = pol(A,\pi.2)$.
+\end{enumerate}
+
+\subsubsection{Monotonic replacement}
+
+Denote with $A[B]_\pi$ formula $A$ with the subformula at the position $\pi$ replaced by $B$.
+
+\begin{lemma}[Monotonic Replacement]
+	Let $A,B,B'$ be formulas, $I$ be an interpretation, and $I \models B \rightarrow B'$. If $pol(A,\pi) = 1$, then $I \models A[B]_\pi \rightarrow A[B']_\pi$. Likewise, if $pol(A,\pi) = -1$ then $I \models A[B']_\pi \rightarrow A[B]_\pi$.
+\end{lemma}
+
+\subsubsection{Pure Atom}
+
+\begin{definition*}
+	Atom $p$ is pure in a formula $A$, if either all occurrences of $p$ in $A$ are positive or all occurrences of $p$ in $A$ are negative.
+\end{definition*}
+
+\begin{lemma}[Pure Atom]
+	Let $p$ have only positive occurrences in $A$ and $I \models A$. Define $I' = I + (p\mapsto 1)$. Then $I' \models A$. Likewise, let $p$ have only negative occurrences in $A$ and $I \models A$. Define $I' = I + (p\mapsto 0)$. Then $I' \models A$.
+\end{lemma}
+
+\begin{lemma}[Pure Atom]
+	Let an atom $p$ have only positive (respectively, only negative) occurrences in $A$. Then $A$ is satisfiable iff $A_p^\top$ (respectively, $A_p^\bot$) is satisfiable.
+\end{lemma}
+
+\subsubsection{Splitting with pure atom optimization}
+
+\begin{algorithm}
+	\begin{verbatim}
+		procedure split(G)
+		parameters: function select
+		input: formula G
+		output: ''satisfiable'' or ''unsatisfiable''
+		begin
+		  G := simplify_with_pure_atoms(G)
+		  if G = 1 then return ''satisfiable''
+		  if G = 0 then return ''unsatisfiable''
+		  (p,b) := select(G)
+		  case b of
+		  1 =>
+		    if split(replace(G,p,1)) = ''satisfiable''
+		      then return ''satisfiable''
+		      else return split(replace(G,p,0))
+		  0 =>
+		    if split(replace(G,p,0)) = ''satisfiable''
+		      then return ''satisfiable''
+		      else return split(replace(G,p,1))
+		end
+	\end{verbatim}
+\end{algorithm}
+
 \section{CNF, DPLL, MiniSat}
+
+\begin{definition*}[Literal]
+	A literal is either an atom $p$ or its negation $\lnot p$.
+\end{definition*}
 
 \section{Random SAT, Horn clauses}
 
