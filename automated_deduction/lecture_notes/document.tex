@@ -533,6 +533,53 @@ For non-unit clauses in any theory:
 
 \section{Theory of Arrays, Theory Combination, Nelson-Oppen, Z3}
 
+\subsubsection{Theory of arrays}
+
+The theory of arrays $\mathcal{T}_A$ is defined by the signature $\{read, write\}$ and the axioms 
+
+$x = y \rightarrow read(write(A,x,v),y)=v$ and $x\not= y \rightarrow read(write(A,x,v),y)=read(A,y)$.
+
+Reduce $\mathcal{T}_A$ to $\mathcal{T}_E$ by
+\begin{itemize}
+	\item If $F$ contains no $write$ terms, replace $read(A,x)$ with $f_A(x)$ in $F$.
+	\item If $F$ contains $write$ terms ($read(write(A,x,v),y)$)
+	\begin{enumerate}
+		\item replace $F$ by $x=y \land F[v]$ where $F[v]$ is the formula obtained by replacing $read(write(A,x,v),y)$ by $v$ in $F$. If this is satisfiable return sat. Else try:
+		\item replace $F$ by $x\not= y \land F[read(A,y)]$ where $F[read(A,y)]$ is the formula obtained by replacing $read(write(A,x,v),y)$ by $read(A,y)$ in $F$. If this is satisfiable return sat. Else return unsat.
+	\end{enumerate}
+\end{itemize}
+
+\subsubsection{Combining theories}
+\begin{algorithm}
+	\begin{verbatim}
+		procedure SeparatingReasoning(F)
+		input: formula F in T1 union ... union Tn
+		output: equisatisfiable formulas F1 in T1, ..., Tn in Tn
+		assumptions: theory signatures S1, ..., Sn are disjoint
+		parameters: function head(t) returning the root symbol of a term t
+		begin
+		  repeat as long as possible
+		    if f in Si and head(t) in Sj with ~i=j:
+		      rewrite F[f(t_1,...,t,...,tm)] into F[f(t1, ..., c, ..., tm)] & c=t where c is a new variable
+		    if p in Si and head(t) in Sj with ~i=j:
+		      rewrite F[p(t_1,...,t,...,tm)] into F[p(t1, ..., c, ..., tm)] & c=t where c is a new variable
+		    if head(s) in Si and head(t) in Sj with ~i=j:
+		      rewrite F[s=t] into F[s=c] & c=t where c is a new variable
+		  end repeat
+		  return modified F as F1 & ... & Fn with each Fi in Ti
+	\end{verbatim}
+\end{algorithm}
+
+This only works if the theories have disjoint signatures, if each theory is stably infinite and if each theory is convex.
+
+\begin{definition*}[stably infinite, convex]
+	A theory $\mathcal{T}$ with signature $\Sigma$ is stably infinite if for every satisfiable formula $F \in \mathcal{T}$ there exists some $\mathcal{T}$ interpretation such that $I\models F$ and $I$ has a domain of infinite cardinality.
+	
+	A theory $\mathcal{T}$ is convex if for every formula $F \in \mathcal{T}$ such that $F$ is a conjunction of $\mathcal{T}$-literals: if $F \rightarrow \bigvee_{j=1}^k(u_j=v_j)$ then $F\rightarrow u_j = v_j$ for some $j \in \{1,...,k\}$.
+\end{definition*}
+
+Both $\mathcal{T}_{\mathbb{Z}}$ and $\mathcal{T}_A$ are not convex, but $\mathcal{T}_E$ and $\mathcal{T}_Q$ are.
+
 \section{First-Order Theorem Proving, TPTP, Inference Systems}
 
 \section{Selection functions, Saturation, Fairness and Redundancy}
