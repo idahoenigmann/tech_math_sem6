@@ -464,7 +464,72 @@ Note that $=$ and $>$ are interpreted, but other symbols are uninterpreted.
 
 $A$ is valid iff $\lnot A$ is unsatisfiable.
 
+\subsubsection{Theory of Equality}
+
+The theory of equality is axiomatized by
+\begin{itemize}
+	\item reflexivity, symmetry and transitivity:
+	
+	$x = x$, $x = y \rightarrow y = x$, $x = y \land y = z \rightarrow x = z$
+	
+	\item congruence axioms for each function symbol $f$ in $\Sigma$:
+	
+	$x_1 = y_1 \land ... \land x_n = y_n \rightarrow f(x_1, ..., x_n) = f(y_1, ..., y_n)$
+	
+	\item congruence axioms for each predicate symbol $p$ of $\Sigma$:
+	
+	$x_1 = y_1 \land ... \land x_n = y_n \land p(x_1, ..., x_n) \rightarrow p(y_1, ..., y_n)$
+\end{itemize}
+
 \section{SMT, Theory of Equality, DPLL(T)}
+
+\subsubsection{Sat modulo theory}
+
+\begin{definition*}[T-interpretation, satisfiable modulo theory]
+	Let $\mathcal{T}$ be a theory axiomatized by $A_\mathcal{T}$. An interpretation $I$ with $I \models A_\mathcal{T}$ then $I$ is called a $\mathcal{T}$-interpretation.
+	
+	A formula $F$ is valid in $\mathcal{T}$ if $F$ is valid in every $\mathcal{T}$-interpretation.
+	
+	A formula $F$ is satisfiable in $\mathcal{T}$ if there exists a $\mathcal{T}$-interpretation which satisfies $F$.
+\end{definition*}
+
+\subsubsection{Congruence Closure}
+
+We can rewrite predicates into formulas (e.g. $p(x) \land \lnot q(x,y)$ gets rewritten to $f_p(x) = t \land f_q(x,y) \not= t$).
+
+\begin{definition*}[congruence class]
+	The congruence class of $t\in S$ under the congruence relation $R$ is $[t]_R = \{t' \in S | tRt'\}$.
+\end{definition*}
+
+\begin{algorithm}
+	\begin{verbatim}
+		procedure CongruenceClosure(F)
+		input: F is s1=t1 & ... & sn = tn & ~s(n+1)=t(n+1) & ... & ~sm=tm
+		output: satisfiable or unsatisfiable
+		parameters: function subterm_set
+		begin
+		  SF := subterm_set(F)
+		  R := {sRs | s in SF} union {{s} | s in SF}
+		  for every si = ti in F
+		    union si and ti in R
+		    propagate by function congruence
+		  if sjRtj for any j=n+1,...,m then return unsatisfiable
+		  else return satisfiable
+		end
+	\end{verbatim}
+\end{algorithm}
+
+\subsubsection{DPLL}
+
+For non-unit clauses in any theory:
+\begin{enumerate}
+	\item Abstract the problem by renaming every literal in the formulas.
+	\item Use a SAT solver to find a model.
+	\item If no model was found return unsat.
+	\item If a model was found use it to get a unit clause version of the original problem and solve it.
+	\item If it has a solution return sat.
+	\item If it does not have a solution rule out the sat model and jump to step 2.
+\end{enumerate}
 
 \section{Theory of Arrays, Theory Combination, Nelson-Oppen, Z3}
 
