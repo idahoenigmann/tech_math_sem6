@@ -662,6 +662,58 @@ $\mathbb{BR}$ with selection is complete for every well-behaved selection functi
 
 \section{Selection functions, Saturation, Fairness and Redundancy}
 
+\subsubsection{Idea of a saturation algorithm}
+
+Initially $S=S_0$. Repeatedly apply inferences in $\mathbb{I}$ to clauses in $S$ and add their conclusions to $S$. Repeat until we either obtain $\square$ and know $S_0$ is unsat, or until every conclusion already is in $S$ and we know $S_0$ is sat.
+
+\begin{definition*}[Saturated, Closure, Inference process, Limit]
+	$S$ is called saturated with respect to $\mathbb{I}$, if for every inference of $\mathbb{I}$ with premises in $S$, the conclusion of this inference also belongs to $S$.
+	
+	The closure of $S$ with respect to $\mathbb{I}$ is the smallest set $S'$ containing $S$ and saturated with respect to $\mathbb{I}$.
+	
+	An $\mathbb{I}$-inference process is a sequence of sets of formulas $S_0 \implies S_1 \implies ...$ where every step is an $\mathbb{I}$-step.
+	
+	$S_i \implies S_{i+1}$ is an $\mathbb{I}$-step if there exists an inference $\frac{F_1 \hspace{0.2cm} ... \hspace{0.2cm} F_n}{F}$ in $\mathbb{I}$ such that $\{F_1,...,F_n\} \subseteq S_i$ and $S_{i+1} = S_i \cup \{F\}$.
+	
+	The limit of an inference process $S_0 \implies S_1 \implies ...$ is $\bigcup_i S_i$.
+\end{definition*}
+
+The limit of an inference process is the set of all derived formulas.
+
+\begin{definition*}[Fairness]
+	Let $S_0 \implies S_1 \implies ...$ be an inference process with the limit $S_\omega$. The process is called fair if for every $\mathbb{I}$-inference $\frac{F_1 \hspace{0.2cm} ... \hspace{0.2cm} F_n}{F}$ where $\{F_1, ..., F_n\} \subseteq S_\omega$ then there exists an $i$ such that $F \in S_i$.
+\end{definition*}
+
+\begin{lemma}
+	$\mathbb{I}$ is complete iff for every unsatisfiable set of formulas $S_0$ and any fair $\mathbb{I}$-inference process with the initial set $S_0$, the limit of this inference process contains $\square$.
+\end{lemma}
+
+There are three possible scenarios when performing a saturation algorithm:
+\begin{itemize}
+	\item The empty clause is generated at some point. In this case the input set of clauses is unsat.
+	\item Saturation terminates without generating the empty clause. In this case the input set of clauses is sat.
+	\item The saturation runs forever without generating the empty clause. In this case the input set of clauses is sat, but in practice we will run out of resources and the satisfiability is unknown.
+\end{itemize}
+
+\subsubsection{Redundancy}
+
+Tautologies (e.g. $p \lor \lnot p \lor C$) and subsumed clauses ($C$ and $C \lor D$) are redundant.
+
+\begin{definition*}[Bag extension]
+	Let $>$ be any (strict) ordering on a set $X$. The bag extension of $>$ is a binary relation $>^{bag}$ on bags over $X$ defined as the smallest transitive relation on bags such that
+	\begin{align*}
+		\{x,y_1,...,y_n\} >^{bag} \{x_1,...,x_m,y_1,...,y_n\} \text{ if } \forall i\in\{1,...,m\}: x>x_i
+	\end{align*}
+\end{definition*}
+
+$>^{bag}$ is an ordering. If $>$ is total then so is $>^{bag}$. If $>$ is well-founded then so is $>^{bag}$.
+
+We can now order clauses by interpreting them as bags of literals.
+
+\begin{definition*}[Redundancy]
+	A clause $C \in S$ is called redundant in $S$ if it is a logical consequence of clauses in $S$ strictly smaller than $C$.
+\end{definition*}
+
 \section{Redundancy, First-Order Reasoning with Equality}
 
 \section{Ground Superposition, Term Orderings}
