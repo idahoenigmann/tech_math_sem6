@@ -570,7 +570,7 @@ Reduce $\mathcal{T}_A$ to $\mathcal{T}_E$ by
 	\end{verbatim}
 \end{algorithm}
 
-This only works if the theories have disjoint signatures, if each theory is stably infinite and if each theory is convex.
+This only works if the theories have disjoint signatures and if each theory is stably infinite.
 
 \begin{definition*}[stably infinite, convex]
 	A theory $\mathcal{T}$ with signature $\Sigma$ is stably infinite if for every satisfiable formula $F \in \mathcal{T}$ there exists some $\mathcal{T}$ interpretation such that $I\models F$ and $I$ has a domain of infinite cardinality.
@@ -580,7 +580,85 @@ This only works if the theories have disjoint signatures, if each theory is stab
 
 Both $\mathcal{T}_{\mathbb{Z}}$ and $\mathcal{T}_A$ are not convex, but $\mathcal{T}_E$ and $\mathcal{T}_Q$ are.
 
+\subsubsection{Exchange of equality between theories}
+
+For a convex theory its decision procedure discovers a new equality $u=v$ for shared $u,v$. Pass this new equality to the decision procedure of the other theories.
+
+For a non-convex theory its decision procedure discovers a disjunction of new equalities $\bigvee_k u_k = v_k$ for shared $u_k, v_k$. Split the disjunction and exchange equalities along multiple branches.
+
 \section{First-Order Theorem Proving, TPTP, Inference Systems}
+
+\subsubsection{TPTP Syntax}
+\begin{verbatim}
+	fof(name, axiom/hypothesis/conjecture,
+	    formula).
+\end{verbatim}
+
+\begin{tabular}{c|c}
+	FOL & TPTP \\
+	\hline
+	$\top, \bot$                        & \verb*|$false,$true| \\
+	$\lnot a$                           & \verb*|~a| \\
+	$a_1 \land ... \land a_n$           & \verb*|a1&...&an| \\
+	$a_1 \lor ... \lor a_n$             & \verb*@a1|...|an@ \\
+	$a_1 \rightarrow a_2$               & \verb*|a1=>a2| \\
+	$(\forall x_1) ... (\forall x_n) a$ & \verb*|![X1,...,Xn]:a| \\
+	$(\exists x_1) ... (\exists x_n) a$ & \verb*|?[X1,...,Xn]:a| \\
+\end{tabular}
+
+\subsubsection{Inference System}
+
+\begin{definition*}[Inference, Inference rule, Inference system, Derivation, Proof]
+	An inference has the form
+	\begin{align*}
+		\frac{F_1 ... F_n}{G}
+	\end{align*}
+	where $n \geq 0$ and $F_1,...,F_n,G$ are formulas. $G$ is called the conclusion of the inference. $F_1,...,F_n$ are called the premises.
+	
+	An inference rule $R$ is a set of inferences. Every inference $I\in R$ is called an instance of $R$.
+	
+	An Inference system $\mathbb{I}$ is a set of inference rules.
+	
+	Axiom is a inference rule with no premises.
+	
+	A derivation in an inference system $\mathbb{I}$ is a tree built from inferences in $\mathbb{I}$. If the root of this derivation is $E$, we say it is a derivation of $E$. A derivation of $E$ from $E_1,...,E_m$ is a finite derivation of $E$ whose every leaf is either an axiom or one of the expressions $E_1,...,E_m$.
+	
+	A proof of $E$ is a finite derivation whose leaves are axioms.
+\end{definition*}
+
+\begin{definition*}[Soundness, Completeness]
+	An inference is sound if the conclusion is a logical consequence of its premises.
+	
+	An inference system is sound if every inference rule in this system is sound.
+	
+	An inference system is complete, if for every unsatisfiable $S$ there exists a derivation of $\square$ from $S$ in the inference system.
+\end{definition*}
+
+\subsubsection{Ground Binary Resolution Inference System}
+
+$\mathbb{BR}$ consists of two inference rules:
+\begin{align*}
+	\frac{p\lor C_1 \hspace{.5cm} \lnot p \lor C_2}{C_1 \lor C_2} (BR) \hspace{1cm} \frac{L\lor L \lor C}{L \lor C} (Fact)
+\end{align*}
+
+$\mathbb{BR}$ is sound.
+
+$\mathbb{BR}$ with selection:
+\begin{align*}
+	\frac{\underline{p}\lor C_1 \hspace{.5cm} \underline{\lnot p} \lor C_2}{C_1 \lor C_2} (BR) \hspace{1cm} \frac{\underline{p}\lor \underline{p} \lor C}{p \lor C} (Fact) \hspace{1cm} \frac{\underline{\lnot p}\lor \underline{\lnot p} \lor C}{\lnot p \lor C} (Fact)
+\end{align*}
+
+\subsubsection{Literal Orderings}
+
+\begin{definition*}[well-founded, well-behaved]
+	$>$ is called a well-founded ordering on atoms, if there exists no infinite decreasing chain of atoms.
+	
+	For a fixed ordering $>$ a well-behaved selection function selects either a negative literal or all maximal literals w.r.t. $>$ must be selected.
+\end{definition*}
+
+We can extend an ordering on atoms to one on literals by $p>q \implies \lnot p > p > \lnot q > q$.
+
+$\mathbb{BR}$ with selection is complete for every well-behaved selection function.
 
 \section{Selection functions, Saturation, Fairness and Redundancy}
 
