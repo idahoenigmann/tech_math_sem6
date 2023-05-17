@@ -716,10 +716,225 @@ We can now order clauses by interpreting them as bags of literals.
 
 \section{Redundancy, First-Order Reasoning with Equality}
 
+\subsubsection{Inference Process with Redundancy}
+
+Let $\mathbb{I}$ be an inference system. Consider an inference process with two kinds of steps $S_i \implies S_{i+1}$:
+\begin{itemize}
+	\item Adding the conclusion of an $\mathbb{I}$-inference with premises in $S_i$.
+	\item Deletion of a clause redundant in $S_i$, that is $S_{i+1}=S_i \setminus \{C\}$ where $C$ is redundant in $S_i$.
+\end{itemize}
+
+\begin{definition*}[Persistent, Limit, Fairness]
+	A clause $C$ is called persistent if $\exists i \forall j \geq i (C \in S_j)$.
+	
+	The limit $S_\omega$ of the inference process is the set of all persistent clauses $S_\omega = \bigcup_{i\in\mathbb{N}} \bigcap_{j\geq i} S_j$.
+	
+	The process is called $\mathbb{I}$-fair with redundancy if every inference with persistent premises in $S_\omega$ has been applied, that is, if $\frac{C_1 ... C_n}{C}$ is an inference in $\mathbb{I}$ and $\{C_1,...,C_n\} \subseteq S_\omega$ then $C \in S_i$ for some $i$.
+\end{definition*}
+
+\begin{lemma}
+	Let $>$ be a well-founded ordering and $\sigma$ a well-behaved selection function. Let $S_0$ be a set of clauses and $S_0 \implies S_1 \implies ...$ be a fair $\mathbb{BR}_\sigma$-inference process.
+	
+	Then $S_0$ is unsat iff $\square \in S_i$ for some $i$.
+\end{lemma}
+
+\begin{definition*}[Saturation up to Redundancy]
+	A set $S$ of clauses is called saturated up to redundancy if for every $\mathbb{I}$-inference $\frac{C_1...C_n}{C}$ with premises in $S$, either $C \in S$ or $C$ is redundant w.r.t. $S$.
+\end{definition*}
+
+\begin{lemma}
+	A set $S$ of clauses saturated up to redundancy is unsat iff $\square \in S$.
+\end{lemma}
+
+\subsubsection{Superposition Inference System}
+
+\begin{definition*}[Equality atom comparison]	
+	$(s' = t') >_{lit} (s=t) \iff \{s',t'\}>_{bag}\{s,t\}$ and
+	
+	$(s' \not= t') >_{lit} (s\not=t) \iff \{s',t'\}>_{bag}\{s,t\}$.
+	
+\end{definition*}
+
+
+Superposition consists of two superposition rules, Equality Resolution and Equality Factoring:
+\begin{align*}
+	\frac{\underline{l=r} \lor C \hspace{.5cm} \underline{s[l]=t} \lor D}{s[r]=t \lor C \lor D} (Sup-right) && \frac{\underline{l=r} \lor C \hspace{.5cm} \underline{s[l]\not=t} \lor D}{s[r]\not=t \lor C \lor D} (Sup-left)\\
+\end{align*}
+where (i) $l>r$, (ii)$s[l]>t$, (iii) $l=r$ is strictly greater than any literal in $C$, (iv) (only for sup-right) $s[l]=t$ is greater than or equal to any literal in $D$
+\begin{align*}
+	\frac{\underline{s\not= s} \lor C}{C} (ER) && \frac{\underline{s=t} \lor s=t' \lor C}{s=t \lor t\not= t' \lor C} (EF)
+\end{align*}
+where (i) $s>t\geq t'$, (ii) $s=t$ is greater than or equal to any literal in $C$.
+
 \section{Ground Superposition, Term Orderings}
+
+\subsubsection{Simplification Orderings}
+
+\begin{definition*}[Simplification ordering]
+	The ordering $>$ on terms is called a simplification ordering if
+	\begin{itemize}
+		\item $>$ is well-founded
+		\item $>$ is monotonic: if $l>r$ then $s[l]>s[r]$
+		\item $>$ is stable under substitutions: if $l>r$ then $l\theta > r\theta$.
+	\end{itemize}
+\end{definition*}
+
+Knuth-Bendix Ordering (KBO) for a given signature $\Sigma$, precedence relation $\gg$ and weight function $w:\Sigma \rightarrow \mathbb{N}$:
+
+Weight of a ground term is $|g(t_1,...,t_n)| = w(g)+ \sum_{i=1}^{n}|t_i|$.
+
+Then $g(t_1,...,t_n) >_{KBO} h(s_1,...,s_m)$ if
+\begin{enumerate}
+	\item $|g(t_1,...,t_n)| > |h(s_1,...,s_m)|$ or
+	\item $|g(t_1,...,t_n)| = |h(s_1,...,s_m)|$ and
+	\begin{enumerate}
+		\item $g\gg h$ or
+		\item $g=h$ and for some $1 \leq i \leq n$ we have $t_1=s_1,...,t_{i-1}=s_{i-1}$ and $t_i > s_i$.
+	\end{enumerate}
+\end{enumerate}
+
+Note that the weight function and the precedence must be compatible.
+
+\begin{definition*}[Weight function]
+	A weight function $w:\Sigma \rightarrow \mathbb{N}$ is a function satisfying:
+	\begin{enumerate}
+		\item $w(a)>0$ for any constant $a\in \Sigma$
+		\item if $w(f)=0$ for a unary function $f\in\Sigma$, then $f\gg g$ for all functions $g\in\Sigma$ with $f\not= g$. That is, $f$ is the greatest element of $\Sigma$ w.r.t. $\gg$.
+	\end{enumerate}
+\end{definition*}
+
+\subsubsection{Demodulation}
+
+Consider the following case of a superposition:
+
+\begin{align*}
+	\frac{\underbrace{l=r} \hspace{0.2cm} \underbrace{s[l]=t} \lor D}{s[r]=t \lor D}(Sup)
+\end{align*}
+
+Note that we have $l=r, s[r]=t \lor D \models s[l]=t \lor D$ and we have $s[l]=t \lor D \geq s[r]=t \lor D$. Therefore the second premise is redundant and can be removed.
 
 \section{Unification and Lifting}
 
+\subsubsection{Substitution}
+
+\begin{definition*}[Substitution]
+	A substitution $\theta$ is a mapping from variables to terms such that the set $\{x | \theta(x) \not= x\}$ is finite.
+	
+	This set is called the domain of $\theta$.
+	
+	We denote a substitution by $\{x_1 \mapsto t_1, ..., x_n \mapsto t_n\}$ where $x_1,...,x_n$ are pairwise different variables.
+\end{definition*}
+
+\begin{lemma}[Herbrand's Theorem]
+	Let $\Sigma$ be a signature with at least one constant symbol and $S$ be a set of (universal) clauses over $\Sigma$. Denote by $S^*$ the set of ground instances of clauses in $S$.
+	
+	Then $S$ is unsat iff $S^*$ is unsat.
+\end{lemma}
+
+\subsubsection{Lifting}
+
+Idea: Represent an infinite number of ground inferences by a single non-ground inference.
+
+\begin{definition*}[Unifier, Most General Unifiers]
+	A unifier of expressions $s_1$ and $s_2$ is a substitution $\theta$ such that $s_1\theta = s_2\theta$.
+	
+	A substitution $\theta$ of $s_1$ and $s_2$ is a mgu if for every other substitution $\theta'$ there exists a substitution $\tau$ such that $\theta\tau = \theta'$.
+\end{definition*}
+
+\begin{algorithm}
+	\begin{verbatim}
+		input: a finite set of equations E
+		output: a solution to E or failure
+		begin
+		  while there exists a non-isolated equation (s=t) in E
+		  do
+		    case (s,t) of
+		      (t,t): remove this equation from E
+		      (x,t):
+		        if x occurs in t then halt with failure
+		        else replace x by t in all other equations of E
+		      (t,x): replace this equation with (x=t)
+		      (c,d): halt with failure
+		      (c,f(t1,...,tn)): halt with failure
+		      (f(t1,...,tn),c): halt with failure
+		      (f(s1,...,sn),f(t1,...,tn)): replace this equation by the set s1=t1,...,sn=tn
+		      (f(s1,...,sm), g(t1,...,tn)): halt with failure
+		  end
+		  now E has the form {x1=r1,...,xl=rl}
+		  return the substitution {x1->r1,...,xl->rl}
+		end
+	\end{verbatim}
+\end{algorithm}
+
+If a unification exists the algorithm finds it. If there exists no unification the algorithm terminates with failure.
+
 \section{Non-Ground Superposition}
+
+\subsubsection{Weight Functions in the Non-Ground Case}
+
+\begin{definition*}[Weight function]
+	A weight function $w:\Sigma \cup Vars \rightarrow \mathbb{N}$ satisfies
+	\begin{itemize}
+		\item $w(x) = v_0$ for all variables $x \in Vars$, where $v_0 > 0$
+		\item $w(a) \geq v_0$ for any constant $a \in \Sigma$
+		\item if $w(f)=0$ for an unary function $f \in \Sigma$, then $f \gg g$ for all function $g \in \Sigma$ with $f\not= g$.
+	\end{itemize}
+\end{definition*}
+
+Denote with $\#(x,s)$ the number of occurrences of $x$ in $s$.
+
+KBO in the non-ground case for a given signature $\Sigma$, precedence relation $\gg$ and weight function $w:\Sigma \cup Vars \rightarrow \mathbb{N}$:
+
+The weight of a term is $|g(t_1,...,t_n)| = w(g) + \sum_{i=1}^{n}|t_i|$.
+
+$s >_{KBO} t$ if
+\begin{enumerate}
+	\item $\#(x,s) \geq \#(x,t)$ for all variables $x$ and $|s|>|t|$ or
+	\item $\#(x,s) \geq \#(x,t)$ for all variables $x$ and $|s|=|t|$ and one of the following holds:
+	\begin{enumerate}
+		\item $t=x$, $s=f^n(x)$ for some $n\geq 1$ or
+		\item $s=g(t_1,...,t_n)$, $t=h(s_1,...,s_m)$ and $g \gg h$ or
+		\item $s=g(t_1,...,t_n)$, $t=g(s_1,...,s_n)$ and for some $1\leq i \leq n$ we have $t_1=s_1,.., t_{i-1}=s_{i-1}$ and $t_i > s_i$.
+	\end{enumerate}
+\end{enumerate}
+
+\subsubsection{Non-ground Superposition}
+
+\begin{align*}
+	\frac{\underline{l=r} \lor C \hspace{.5cm} \underline{s[l']=t} \lor D}{(s[r]=t \lor C \lor D)\theta} (Sup-right) && \frac{\underline{l=r} \lor C \hspace{.5cm} \underline{s[l']\not=t} \lor D}{(s[r]\not=t \lor C \lor D)\theta} (Sup-left)\\
+\end{align*}
+where (i) $\theta$ is a mgu of $l$ and $l'$, (ii) $l'$ is not a variable, (iii) $r\theta \not\geq l\theta$, (iv) $t\theta\not\geq s[l']\theta$.
+\begin{align*}
+	\frac{\underline{s\not= s'} \lor C}{C\theta} (ER) && \frac{\underline{l=r} \lor l'=r' \lor C}{(l=r \lor r\not= r' \lor C)\theta} (EF)
+\end{align*}
+where $\theta$ is a mgu of $s$ and $s'$ in (ER) and where $\theta$ is a mgu of $l$ and $l'$, $r\theta \not\geq l\theta$, $r'\theta \not\geq l\theta$, and $r'\theta \not\geq r\theta$ in (EF).
+
+
+\subsubsection{Non-ground Binary Resolution}
+
+\begin{align*}
+	\frac{\underline{p}\lor C_1 \hspace{.5cm} \underline{\lnot p'} \lor C_2}{(C_1 \lor C_2)\theta} (BR) \hspace{1cm} \frac{\underline{p}\lor \underline{p'} \lor C}{(p \lor C)\theta} (Fact) \hspace{1cm} \frac{\underline{\lnot p}\lor \underline{\lnot p'} \lor C}{(\lnot p \lor C)\theta} (Fact)
+\end{align*}
+
+where $\theta$ is a mgu of $p$ and $p'$.
+
+\subsubsection{Redundancy}
+
+\begin{definition*}[Subsumption]
+	A clause $C$ subsumes a clause $D$ if $C\theta \subseteq D$ for some substitution $\theta$.
+\end{definition*}
+
+Demodulation in the non-ground case
+
+\begin{align*}
+	\frac{l=r \hspace{.5cm} L[l\theta] \lor D}{L[r\theta] \lor D}
+\end{align*}
+where $l\theta > r\theta$, and $(L[l']\lor D)\theta > (l\theta > r\theta)$.
+
+\begin{definition*}[simplifying, generating]
+	An inference $\frac{C_1 ... C_n}{C}$ is called simplifying if at least one premise $C_i$ becomes redundant after the addition of the conclusion $C$ to the search space.
+	
+	A non-simplifying inference is called generating.
+\end{definition*}
 
 \end{document}
