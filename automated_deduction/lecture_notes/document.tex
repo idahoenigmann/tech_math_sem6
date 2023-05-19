@@ -808,7 +808,7 @@ Note that the weight function and the precedence must be compatible.
 Consider the following case of a superposition:
 
 \begin{align*}
-	\frac{\underbrace{l=r} \hspace{0.2cm} \underbrace{s[l]=t} \lor D}{s[r]=t \lor D}(Sup)
+	\frac{\underline{l=r} \hspace{0.2cm} \underline{s[l]=t} \lor D}{s[r]=t \lor D}(Sup)
 \end{align*}
 
 Note that we have $l=r, s[r]=t \lor D \models s[l]=t \lor D$ and we have $s[l]=t \lor D \geq s[r]=t \lor D$. Therefore the second premise is redundant and can be removed.
@@ -838,7 +838,7 @@ Idea: Represent an infinite number of ground inferences by a single non-ground i
 \begin{definition*}[Unifier, Most General Unifiers]
 	A unifier of expressions $s_1$ and $s_2$ is a substitution $\theta$ such that $s_1\theta = s_2\theta$.
 	
-	A substitution $\theta$ of $s_1$ and $s_2$ is a mgu if for every other substitution $\theta'$ there exists a substitution $\tau$ such that $\theta\tau = \theta'$.
+	A unifier $\theta$ of $s_1$ and $s_2$ is a mgu if for every other substitution $\theta'$ there exists a substitution $\tau$ such that $\theta\tau = \theta'$.
 \end{definition*}
 
 \begin{algorithm}
