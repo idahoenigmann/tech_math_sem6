@@ -1,5 +1,5 @@
-\documentclass[]{article}
-\usepackage[a4paper,margin=0.5cm,landscape]{geometry}
+\documentclass[9pt]{extarticle}
+\usepackage[a4paper,margin=1cm,landscape]{geometry}
 \usepackage{amsmath}
 \usepackage{amsfonts}
 \usepackage{amssymb}
@@ -10,10 +10,17 @@
 \usepackage{multicol}
 \usepackage{graphicx}
 
-\usepackage{xpatch}
-\makeatletter
-\xpatchcmd{\@thm}{\thm@headpunct{.}}{\thm@headpunct{}}{}{}
-\makeatother
+\newtheoremstyle{theoremstyle}
+{5pt} % Space above
+{5pt} % Space below
+{} % Body font
+{} % Indent amount
+{\bfseries} % Theorem head font
+{} % Punctuation after theorem head
+{0em} % Space after theorem head
+{} % Theorem head spec (can be left empty, meaning `normal')
+
+\theoremstyle{theoremstyle}
 
 \newtheorem*{green}{}
 \newtheorem*{red}{}
@@ -67,7 +74,7 @@
 \begin{document}	
 	
 \begin{multicols}{3}
-\begin{minipage}[t]{.31\textwidth}
+\begin{minipage}[t]{.30\textwidth}
 
 \begin{green}
 \begin{tabular}{c|c}
@@ -148,34 +155,47 @@ Clauses of the form $p$ are solved by setting $p \mapsto 1$ and propagating. Sam
 
 SAT is NP-complete.
 
-\subsubsection*{GSAT}
-\begin{red}
-\begin{verbatim}
-repeat max_tries times:
-    I = random interpretation
-    if I models S return I
-    repeat max_flip times:
-        p = variable s.t. flip(I,p)
-            satisfies max clauses in S
-        I = flip(I, p)
-        if I models S return I
-return don't know	
-\end{verbatim}
-\end{red}
+
+\subsubsection*{TPTP Syntax}
+\begin{green}
+	
+	\begin{verbatim}
+		fof(name, axiom/conjecture/hypothesis, formula).
+	\end{verbatim}
+	
+	\begin{tabular}{c|c}
+		$\top, \bot$ & \verb|$true, $false|\\
+		\hline
+		$\lnot a$ & \verb|~a|\\
+		\hline
+		$a_1 \land ... \land a_n$ & \verb|a1&...&an|\\
+		\hline
+		$a_1 \lor ... \lor a_n$ & \verb@a1|...|an@\\
+		\hline
+		$a_1 \rightarrow a_2$ & \verb|a1=>a2|\\
+		\hline
+		$\forall x_1 ... \forall x_n (a)$ & \verb|![X1,...,Xn]:a|\\
+		\hline
+		$\exists x_1 ... \exists x_n (a)$ & \verb|?[X1,...,Xn]:a|\\
+	\end{tabular}
+\end{green}
 
 \end{minipage}\hfil
 
-\begin{minipage}[t]{.31\textwidth}
-\subsubsection*{WSAT}
+\begin{minipage}[t]{.30\textwidth}
+
+\subsubsection*{GSAT / WSAT}
 \begin{red}
 \begin{verbatim}
 repeat max_tries times:
     I = random interpretation
     if I models S return I
     repeat max_flip times:
-        randomly select clause C in S
-                   s.t. I does not model C
-        randomly select variable p in C
+        p = variable s.t. flip(I,p)        | GSAT
+            satisfies max clauses in S     |
+        randomly select clause C in S      -
+                 s.t. I does not model C   - WSAT
+        randomly select variable p in C    -
         I = flip(I, p)
         if I models S return I
 return don't know	
@@ -200,48 +220,47 @@ $A$ with free variables $\bar{x}$ is \textbf{valid in an interpretation} $I$ if 
 $A$ is \textbf{valid} iff it is valid in every interpretation ($\iff \lnot A$ is unsat.)
 \end{green}
 
+\subsubsection*{DPLL}
+\begin{blue}
+	Unit propagation, Pure literal elimination, Splitting
+\end{blue}
+
 \subsubsection*{Congruence Closure}
 \begin{blue}
 	For every equation $s=t$ union $[s]$ and $[t]$ and function propagate. If $s \not= t$, but $[s] = [t]$ report unsat, else report sat.
 \end{blue}
 
-\subsubsection*{DPLL}
-\begin{blue}
-Unit propagation, Pure literal elimination, Splitting
-\end{blue}
-
-\begin{red}
-\begin{verbatim}
-abstract by renaming literals
-use SAT solver to find model
-if no model found return unsat
-else solve resulting unit clause problem
-if solution exists return sat
-else rule out this model and go back to SAT solver
-\end{verbatim}
-\end{red}
-
 \subsubsection*{Theory of Arrays}
 \begin{blue}
-read without write: $read(A,x) \rightsquigarrow f_A(x)$
-
-read with write: $read(write(A,x,v),y) \rightsquigarrow x=y \land F[v]$
-
-or \hspace{4cm} $\rightsquigarrow x\not= y \land F[read(A,y)]$
+	read without write: $read(A,x) \rightsquigarrow f_A(x)$
+	
+	read with write: $read(write(A,x,v),y) \rightsquigarrow x=y \land F[v]$
+	
+	or \hspace{4cm} $\rightsquigarrow x\not= y \land F[read(A,y)]$
 \end{blue}
+
+
 
 \end{minipage}\hfil
 
-\begin{minipage}[t]{.31\textwidth}
+\begin{minipage}[t]{.30\textwidth}
+
+\begin{red}
+	\begin{verbatim}
+		abstract by renaming literals
+		use SAT solver to find model
+		if no model found return unsat
+		else solve resulting unit clause problem
+		if solution exists return sat
+		else rule out this model and go back to SAT solver
+	\end{verbatim}
+\end{red}
 
 \subsubsection*{Combining Theories}
 \begin{blue}
 Rename subterms s.t. each formula is only in one theory.
-\end{blue}
 
-\subsubsection*{Decision Procedure for Combined Theories}
-\begin{blue}
-Discover shared $u=v$ (or $\bigvee_k u_k = v_k$ then use splitting) and pass to other theories.
+Discover shared equality $u=v$ (or $\bigvee_k u_k = v_k$ then use splitting) and pass to other theories.
 \end{blue}
 
 \begin{green}
@@ -262,38 +281,6 @@ Theory $\mathcal{T}$ is \textbf{convex} if $\forall F \in \mathcal{T}$ .. conjun
 
 $\mathcal{T}_E$, $\mathcal{T}_Q$ are convex. $\mathcal{T}_Z$, $\mathcal{T}_A$ are not convex.
 
-\subsubsection*{TPTP Syntax}
-\begin{green}
-	
-\begin{verbatim}
-fof(name, axiom/conjecture/hypothesis, formula).
-\end{verbatim}
-
-\begin{tabular}{c|c}
-	$\top, \bot$ & \verb|$true, $false|\\
-	\hline
-	$\lnot a$ & \verb|~a|\\
-	\hline
-	$a_1 \land ... \land a_n$ & \verb|a1&...&an|\\
-	\hline
-	$a_1 \lor ... \lor a_n$ & \verb@a1|...|an@\\
-	\hline
-	$a_1 \rightarrow a_2$ & \verb|a1=>a2|\\
-	\hline
-	$\forall x_1 ... \forall x_n (a)$ & \verb|![X1,...,Xn]:a|\\
-	\hline
-	$\exists x_1 ... \exists x_n (a)$ & \verb|?[X1,...,Xn]:a|\\
-	\hline
-\end{tabular}
-\end{green}
-
-\subsubsection*{Binary Resolution}
-\begin{blue}
-\begin{align*}
-	\frac{\underline{p}\lor C_1 \hspace{.5cm} \underline{\lnot p} \lor C_2}{C_1 \lor C_2} (BR) \hspace{1cm} \frac{\underline{L}\lor \underline{L} \lor C}{L \lor C} (Fact)
-\end{align*}
-\end{blue}
-
 \begin{green}
 $\mathbf{>^{bag}}$ is the smallest transitive relation on bags of $X$ s.t.
 \begin{align*}
@@ -302,28 +289,57 @@ $\mathbf{>^{bag}}$ is the smallest transitive relation on bags of $X$ s.t.
 \end{align*}
 \end{green}
 
+$(s' = t') >_{lit} (s=t) \iff \{s',t'\}>_{bag}\{s,t\}$ and
+
+$(s' \not= t') >_{lit} (s\not=t) \iff \{s',t'\}>_{bag}\{s,t\}$.
+
 \begin{green}
 A clause $C \in S$ is called \textbf{redundant} in $S$ if it is a logical consequence of clauses in $S$ strictly smaller than $C$.
+\end{green}
+
+
+\begin{green}
+	\textbf{Limit} $\mathbf{S_\omega} = \bigcup_{i\in\mathbb{N}} \bigcap_{j\geq i} S_j$ ... set of all persistent clauses
+\end{green}
+
+\begin{green}
+	$S$... set of clauses is \textbf{saturated up to redundancy} if $\forall \frac{C_1...C_n}{C} ... \mathbb{I}$-inference with premises in $S$, either $C \in S$ or $C$ is redundant w.r.t. $S$.
+\end{green}
+
+\begin{green}
+	$>$ on terms is \textbf{simplification ordering} if well-founded; monotonic (if $l>r$ then $s[l]>s[r]$); stable under substitutions (if $l>r$ then $l\theta > r\theta$).
 \end{green}
 
 \end{minipage}
 
 \newpage
 
-\begin{minipage}[t]{.31\textwidth}
+\begin{minipage}[t]{.30\textwidth}
+	
+\subsubsection*{Knuth-Bendix Ordering (KBO)}
 \begin{green}
-	\textbf{Limit} $\mathbf{S_\omega} = \bigcup_{i\in\mathbb{N}} \bigcap_{j\geq i} S_j$ ... set of all persistent clauses
+	given signature $\Sigma$, precedence relation $\gg$ and weight function $w:\Sigma \rightarrow \mathbb{N}$:
+	
+	Ground term weight: $|g(t_1,...,t_n)| = w(g)+ \sum_{i=1}^{n}|t_i|$.
+	
+	$g(t_1,...,t_n) >_{KBO} h(s_1,...,s_m)$ if
+	\begin{enumerate}
+		\item $|g(t_1,...,t_n)| > |h(s_1,...,s_m)|$ or
+		\item $|g(t_1,...,t_n)| = |h(s_1,...,s_m)|$ and
+		\begin{enumerate}
+			\item $g\gg h$ or
+			\item $g=h$ and for some $1 \leq i \leq n$ we have $t_1=s_1,...,t_{i-1}=s_{i-1}$ and $t_i > s_i$.
+		\end{enumerate}
+	\end{enumerate}
 \end{green}
+	
+\subsubsection*{Binary Resolution}
+\begin{blue}
+	\begin{align*}
+		\frac{\underline{p}\lor C_1 \hspace{.5cm} \underline{\lnot p} \lor C_2}{C_1 \lor C_2} (BR) \hspace{1cm} \frac{\underline{L}\lor \underline{L} \lor C}{L \lor C} (Fact)
+	\end{align*}
+\end{blue}
 
-\begin{green}
-$S$... set of clauses is \textbf{saturated up to redundancy} if $\forall \frac{C_1...C_n}{C} ... \mathbb{I}$-inference with premises in $S$, either $C \in S$ or $C$ is redundant w.r.t. $S$.
-\end{green}
-
-\begin{green}
-$(s' = t') >_{lit} (s=t) \iff \{s',t'\}>_{bag}\{s,t\}$ and
-
-$(s' \not= t') >_{lit} (s\not=t) \iff \{s',t'\}>_{bag}\{s,t\}$.
-\end{green}
 
 \subsubsection*{Superposition}
 \begin{blue}
@@ -339,32 +355,6 @@ where (i) $s>t\geq t'$, (ii) $s=t$ is greater than or equal to any literal in $C
 \end{blue}
 
 \begin{green}
-$>$ on terms is \textbf{simplification ordering} if well-founded; monotonic (if $l>r$ then $s[l]>s[r]$); stable under substitutions (if $l>r$ then $l\theta > r\theta$).
-\end{green}
-
-
-\subsubsection*{Knuth-Bendix Ordering (KBO)}
-\begin{green}
-given signature $\Sigma$, precedence relation $\gg$ and weight function $w:\Sigma \rightarrow \mathbb{N}$:
-
-Ground term weight: $|g(t_1,...,t_n)| = w(g)+ \sum_{i=1}^{n}|t_i|$.
-
-$g(t_1,...,t_n) >_{KBO} h(s_1,...,s_m)$ if
-\begin{enumerate}
-	\item $|g(t_1,...,t_n)| > |h(s_1,...,s_m)|$ or
-	\item $|g(t_1,...,t_n)| = |h(s_1,...,s_m)|$ and
-	\begin{enumerate}
-		\item $g\gg h$ or
-		\item $g=h$ and for some $1 \leq i \leq n$ we have $t_1=s_1,...,t_{i-1}=s_{i-1}$ and $t_i > s_i$.
-	\end{enumerate}
-\end{enumerate}
-\end{green}
-
-\end{minipage}\hfil
-
-\begin{minipage}[t]{.31\textwidth}
-	
-\begin{green}
 	\textbf{weight function} $w:\Sigma \cup Vars \rightarrow \mathbb{N}$ satisfies:
 	\begin{itemize}
 		\item $\forall x$ ... variables: $ w(x) = v_0 (> 0)$
@@ -372,7 +362,12 @@ $g(t_1,...,t_n) >_{KBO} h(s_1,...,s_m)$ if
 		\item $\exists f$ ... unary function$: w(f)=0$ then $\forall g\not=f$ ... function: $f \gg g$.
 	\end{itemize}
 \end{green}
-	
+
+\end{minipage}\hfil
+
+\begin{minipage}[t]{.30\textwidth}
+
+
 \subsubsection*{Demodulation}
 \begin{align*}
 	\frac{\underline{l=r} \hspace{0.2cm} \underline{s[l]=t} \lor D}{s[r]=t \lor D}(Sup)
@@ -418,7 +413,7 @@ A non-simplifying inference is called \textbf{generating}.
 
 \end{minipage}\hfil
 
-\begin{minipage}[t]{.31\textwidth}
+\begin{minipage}[t]{.30\textwidth}
 
 \subsubsection*{Non-ground KBO}
 
