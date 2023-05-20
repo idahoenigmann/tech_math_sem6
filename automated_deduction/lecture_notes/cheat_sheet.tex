@@ -99,38 +99,38 @@ in this order from left to right: $\top, \bot, \lnot, \land, \lor, \rightarrow, 
 
 \subsubsection*{Polarity}
 \begin{blue}
+\begin{center}
 \begin{tikzpicture}
 	\tikzstyle{node} = [circle, draw=black, fill=white];
 	
-	\draw[thick] (1,1) -- (0,0) node[draw=none,fill=none,font=\scriptsize,midway,left] {1};
-	\draw[thick] (1,1) -- (1,0) node[draw=none,fill=none,font=\scriptsize,midway,left] {1};
-	\draw[thick] (1,1) -- (2,0) node[draw=none,fill=none,font=\scriptsize,midway,right] {1};
+	\draw[thick] (1,1) -- (0.5,0) node[draw=none,fill=none,font=\scriptsize,midway,left] {1};
+	\draw[thick] (1,1) -- (1.5,0) node[draw=none,fill=none,font=\scriptsize,midway,left] {1};
 	
-	\draw[thick] (3,1) -- (3,0) node[draw=none,fill=none,font=\scriptsize,midway,left] {-1};;
+	\draw[thick] (2.5,1) -- (2.5,0) node[draw=none,fill=none,font=\scriptsize,midway,left] {-1};;
 	
-	\draw[thick] (4.5,1) -- (4,0) node[draw=none,fill=none,font=\scriptsize,midway,left] {-1};
-	\draw[thick] (4.5,1) -- (5,0) node[draw=none,fill=none,font=\scriptsize,midway,right] {1};
+	\draw[thick] (4,1) -- (3.5,0) node[draw=none,fill=none,font=\scriptsize,midway,left] {-1};
+	\draw[thick] (4,1) -- (4.5,0) node[draw=none,fill=none,font=\scriptsize,midway,right] {1};
 
-	\draw[thick] (6.5,1) -- (6,0) node[draw=none,fill=none,font=\scriptsize,midway,left] {0};
-	\draw[thick] (6.5,1) -- (7,0) node[draw=none,fill=none,font=\scriptsize,midway,right] {0};
+	\draw[thick] (6,1) -- (5.5,0) node[draw=none,fill=none,font=\scriptsize,midway,left] {0};
+	\draw[thick] (6,1) -- (6.5,0) node[draw=none,fill=none,font=\scriptsize,midway,right] {0};
 	
 	\node[node, label=$\land$/$\lor$] at (1, 1) (aotop) {};
-		\node[node] at (0, 0) (aol) {};
-		\node[node] at (1, 0) (aom) {};
-		\node[node] at (2, 0) (aor) {};
+		\node[node] at (0.5, 0) (aol) {};
+		\node[node] at (1.5, 0) (aor) {};
 		
-	\node[node, label=$\lnot$] at (3, 1) (ntop) {};
-		\node[node] at (3, 0) (nm) {};
+	\node[node, label=$\lnot$] at (2.5, 1) (ntop) {};
+		\node[node] at (2.5, 0) (nm) {};
 	
-	\node[node, label=$\rightarrow$] at (4.5, 1) (itop) {};
-		\node[node] at (4, 0) (il) {};
-		\node[node] at (5, 0) (ir) {};
+	\node[node, label=$\rightarrow$] at (4, 1) (itop) {};
+		\node[node] at (3.5, 0) (il) {};
+		\node[node] at (4.5, 0) (ir) {};
 		
-	\node[node, label=$\leftrightarrow$] at (6.5, 1) (etop) {};
-		\node[node] at (6, 0) (el) {};
-		\node[node] at (7, 0) (er) {};
+	\node[node, label=$\leftrightarrow$] at (6, 1) (etop) {};
+		\node[node] at (5.5, 0) (el) {};
+		\node[node] at (6.5, 0) (er) {};
 
 \end{tikzpicture}
+\end{center}
 
 $p$ ... pos. pure $\implies p \mapsto 1$; $p$ ... neg. pure $\implies p \mapsto 0$
 
@@ -206,6 +206,10 @@ $A$ is \textbf{valid} iff it is valid in every interpretation ($\iff \lnot A$ is
 \end{blue}
 
 \subsubsection*{DPLL}
+\begin{blue}
+Unit propagation, Pure literal elimination, Splitting
+\end{blue}
+
 \begin{red}
 \begin{verbatim}
 abstract by renaming literals
