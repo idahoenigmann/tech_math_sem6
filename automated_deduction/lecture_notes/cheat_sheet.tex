@@ -148,41 +148,33 @@ $p$ ... pos. pure $\implies p \mapsto 1$; $p$ ... neg. pure $\implies p \mapsto 
 Replace subformula $s$ with name $n$ and add $n\leftrightarrow s$ (if $s$ occurs only positively $n\rightarrow s$ elif $s$ occurs only negatively $s \rightarrow n$).
 \end{blue}
 
+\subsubsection*{Rewrite into CNF}
+\begin{blue}
+\begin{align*}
+	A \leftrightarrow B &\implies (\lnot A \lor B) \land (\lnot B \lor A) \\
+	A \rightarrow B &\implies \lnot A \lor B \\
+	\lnot (A \land B) &\implies \lnot A \lor \lnot B \\
+	\lnot (A \lor B) &\implies \lnot A \land \lnot B \\
+	\lnot \lnot A &\implies A \\
+	(A_1 \land A_2) \lor B &\implies (A_1 \lor B) \land (A_2 \lor B)
+\end{align*}
+\end{blue}
+
 \subsubsection*{Unit Propagation}
 \begin{blue}
 Clauses of the form $p$ are solved by setting $p \mapsto 1$ and propagating. Same with $\lnot p$ where $p \mapsto 0$.
 \end{blue}
 
-SAT is NP-complete.
-
-
-\subsubsection*{TPTP Syntax}
-\begin{green}
-	
-	\begin{verbatim}
-		fof(name, axiom/conjecture/hypothesis, formula).
-	\end{verbatim}
-	
-	\begin{tabular}{c|c}
-		$\top, \bot$ & \verb|$true, $false|\\
-		\hline
-		$\lnot a$ & \verb|~a|\\
-		\hline
-		$a_1 \land ... \land a_n$ & \verb|a1&...&an|\\
-		\hline
-		$a_1 \lor ... \lor a_n$ & \verb@a1|...|an@\\
-		\hline
-		$a_1 \rightarrow a_2$ & \verb|a1=>a2|\\
-		\hline
-		$\forall x_1 ... \forall x_n (a)$ & \verb|![X1,...,Xn]:a|\\
-		\hline
-		$\exists x_1 ... \exists x_n (a)$ & \verb|?[X1,...,Xn]:a|\\
-	\end{tabular}
-\end{green}
-
 \end{minipage}\hfil
 
 \begin{minipage}[t]{.30\textwidth}
+
+\subsubsection*{DPLL}
+\begin{blue}
+	Unit propagation, Pure literal elimination, Splitting
+\end{blue}
+
+SAT is NP-complete.
 
 \subsubsection*{GSAT / WSAT}
 \begin{red}
@@ -219,11 +211,6 @@ $A$ with free variables $\bar{x}$ is \textbf{valid in an interpretation} $I$ if 
 
 $A$ is \textbf{valid} iff it is valid in every interpretation ($\iff \lnot A$ is unsat.)
 \end{green}
-
-\subsubsection*{DPLL}
-\begin{blue}
-	Unit propagation, Pure literal elimination, Splitting
-\end{blue}
 
 \subsubsection*{Congruence Closure}
 \begin{blue}
@@ -354,6 +341,19 @@ where (i) $l>r$, (ii)$s[l]>t$, (iii) $l=r$ is strictly greater than any literal 
 where (i) $s>t\geq t'$, (ii) $s=t$ is greater than or equal to any literal in $C$.
 \end{blue}
 
+\subsubsection*{Subsumption}
+A clause $C$ subsumes any clause $D$ if $C\theta \subseteq D$ for some substitution $\theta$.
+
+\subsubsection*{Demodulation}
+\begin{align*}
+	\frac{\underline{l=r} \hspace{0.2cm} \underline{s[l]=t} \lor D}{s[r]=t \lor D}(Sup)
+\end{align*}
+then the right premise becomes redundant.
+
+\end{minipage}\hfil
+
+\begin{minipage}[t]{.30\textwidth}
+
 \begin{green}
 	\textbf{weight function} $w:\Sigma \cup Vars \rightarrow \mathbb{N}$ satisfies:
 	\begin{itemize}
@@ -362,17 +362,6 @@ where (i) $s>t\geq t'$, (ii) $s=t$ is greater than or equal to any literal in $C
 		\item $\exists f$ ... unary function$: w(f)=0$ then $\forall g\not=f$ ... function: $f \gg g$.
 	\end{itemize}
 \end{green}
-
-\end{minipage}\hfil
-
-\begin{minipage}[t]{.30\textwidth}
-
-
-\subsubsection*{Demodulation}
-\begin{align*}
-	\frac{\underline{l=r} \hspace{0.2cm} \underline{s[l]=t} \lor D}{s[r]=t \lor D}(Sup)
-\end{align*}
-then the right premise becomes redundant.
 
 \begin{green}
 \textbf{substitution} $\mathbf{\theta}$ is a mapping from variables to terms such that the set $\{x | \theta(x) \not= x\}$ is finite and is denoted by $\{x_1 \mapsto t_1, ..., x_n \mapsto t_n\}$.
@@ -410,6 +399,27 @@ Inference $\frac{C_1 ... C_n}{C}$ is called \textbf{simplifying} if a premise $C
 	
 A non-simplifying inference is called \textbf{generating}.
 \end{green}
+
+\subsubsection*{TPTP Syntax}	
+\begin{verbatim}
+	fof(name, axiom/conjecture/hypothesis, formula).
+\end{verbatim}
+
+\begin{tabular}{c|c}
+	$\top, \bot$ & \verb|$true, $false|\\
+	\hline
+	$\lnot a$ & \verb|~a|\\
+	\hline
+	$a_1 \land ... \land a_n$ & \verb|a1&...&an|\\
+	\hline
+	$a_1 \lor ... \lor a_n$ & \verb@a1|...|an@\\
+	\hline
+	$a_1 \rightarrow a_2$ & \verb|a1=>a2|\\
+	\hline
+	$\forall x_1 ... \forall x_n (a)$ & \verb|![X1,...,Xn]:a|\\
+	\hline
+	$\exists x_1 ... \exists x_n (a)$ & \verb|?[X1,...,Xn]:a|\\
+\end{tabular}
 
 \end{minipage}\hfil
 
